@@ -5,12 +5,21 @@ plugins {
 }
 
 group = "cz.habarta.typescript-generator"
-version = "3.2-SNAPSHOT"
+version = "3.2-KINNU"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(19))
+    }
+}
 
 
 
 dependencies {
-    api("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:${version}")
+//    api("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:${version}")
+    api("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:3.2-SNAPSHOT")
 }
 
 gradlePlugin {
