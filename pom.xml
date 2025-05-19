@@ -39,12 +39,12 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh-vojtech@habarta.cz</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>kinnu-gradle</id>
+            <url>https://kinnu-471112671295.d.codeartifact.eu-west-1.amazonaws.com/maven/kinnu-gradle/</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh-vojtech@habarta.cz</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>kinnu-gradle</id>
+            <url>https://kinnu-471112671295.d.codeartifact.eu-west-1.amazonaws.com/maven/kinnu-gradle/</url>
         </repository>
         <site>
             <id>github.io</id>

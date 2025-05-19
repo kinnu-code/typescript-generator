@@ -85,6 +85,8 @@ public class Settings {
     public DateMapping mapDate; // default is DateMapping.asDate
     public MapMapping mapMap; // default is MapMapping.asIndexedArray
     public EnumMapping mapEnum; // default is EnumMapping.asUnion
+    public List<String> kinnuEnumFields = new ArrayList<>();
+    public List<String> kinnuEnumExcludes = new ArrayList<>();
     public IdentifierCasing enumMemberCasing; // default is IdentifierCasing.keepOriginal
     public boolean nonConstEnums = false;
     public List<Class<? extends Annotation>> nonConstEnumAnnotations = new ArrayList<>();

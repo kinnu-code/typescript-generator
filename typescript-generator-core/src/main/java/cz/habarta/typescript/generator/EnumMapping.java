@@ -3,5 +3,5 @@ package cz.habarta.typescript.generator;
 
 
 public enum EnumMapping {
-    asUnion, asInlineUnion, asEnum, asNumberBasedEnum
+    asUnion, asInlineUnion, asEnum, asNumberBasedEnum, asKinnuEnum
 }

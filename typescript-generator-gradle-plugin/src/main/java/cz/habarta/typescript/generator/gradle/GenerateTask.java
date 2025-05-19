@@ -81,6 +81,8 @@ public class GenerateTask extends DefaultTask {
     public DateMapping mapDate;
     public MapMapping mapMap;
     public EnumMapping mapEnum;
+    public List<String> kinnuEnumFields;
+    public List<String> kinnuEnumExcludes;
     public IdentifierCasing enumMemberCasing;
     public boolean nonConstEnums;
     public List<String> nonConstEnumAnnotations;
@@ -164,6 +166,8 @@ public class GenerateTask extends DefaultTask {
         settings.mapDate = mapDate;
         settings.mapMap = mapMap;
         settings.mapEnum = mapEnum;
+        settings.kinnuEnumFields = kinnuEnumFields;
+        settings.kinnuEnumExcludes = kinnuEnumExcludes;
         settings.enumMemberCasing = enumMemberCasing;
         settings.nonConstEnums = nonConstEnums;
         settings.loadNonConstEnumAnnotations(classLoader, nonConstEnumAnnotations);

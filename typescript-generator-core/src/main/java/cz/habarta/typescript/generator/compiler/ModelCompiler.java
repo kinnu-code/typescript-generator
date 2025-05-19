@@ -59,6 +59,7 @@ import cz.habarta.typescript.generator.util.GenericsResolver;
 import cz.habarta.typescript.generator.util.Pair;
 import cz.habarta.typescript.generator.util.Utils;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
@@ -162,6 +163,9 @@ public class ModelCompiler {
         tsModel = addEnumValuesToJavadoc(tsModel);
         if (settings.enumMemberCasing != null && settings.enumMemberCasing != IdentifierCasing.keepOriginal) {
             tsModel = transformEnumMembersCase(tsModel);
+        }
+        if (settings.mapEnum == EnumMapping.asKinnuEnum) {
+            tsModel = transformEnumsToKinnuBasedEnum(tsModel, settings.kinnuEnumFields, settings.kinnuEnumExcludes);
         }
         if (!settings.areDefaultStringEnumsOverriddenByExtension()) {
             if (settings.mapEnum == null || settings.mapEnum == EnumMapping.asUnion || settings.mapEnum == EnumMapping.asInlineUnion) {
@@ -973,6 +977,59 @@ public class ModelCompiler {
             enums.add(enumModel.withMembers(members));
         }
         return tsModel.withRemovedEnums(stringEnums).withAddedEnums(new ArrayList<>(enums));
+    }
+
+    private TsModel transformEnumsToKinnuBasedEnum(TsModel tsModel, List<String> kinnuEnumFields, List<String> excludes) {
+        final List<TsEnumModel> stringEnums = tsModel.getEnums(EnumKind.StringBased);
+        final LinkedHashSet<TsEnumModel> enums = new LinkedHashSet<>();
+        for (TsEnumModel enumModel : stringEnums) {
+
+            final List<EnumMemberModel> members = new ArrayList<>();
+            final Class<Enum<?>> origin = (Class<Enum<?>>) enumModel.getOrigin();
+
+            final Field idField = extractKinnuEnumField(origin, kinnuEnumFields);
+            boolean isExcluded = excludes.stream().anyMatch(it -> origin.getName().equals(it));
+
+            if (idField != null && !isExcluded) {
+                try {
+                    idField.setAccessible(true);
+                    final Enum<?>[] constants = origin.getEnumConstants();
+                    for (Enum<?> constant : constants) {
+                        final Field constantField = origin.getDeclaredField(constant.name());
+                        constantField.setAccessible(true);
+                        final Object value = idField.get(constant);
+                        if (value instanceof Number) {
+                            members.add(new EnumMemberModel(constant.name(), (Number) idField.get(constant), constantField, null));
+                        } else {
+                            members.add(new EnumMemberModel(constant.name(), value.toString(), constantField, null));
+                        }
+                    }
+                } catch (IllegalAccessException | NoSuchFieldException e) {
+                    members.addAll(enumModel.getMembers());
+                }
+            } else {
+                members.addAll(enumModel.getMembers());
+            }
+
+            enums.add(enumModel.withMembers(members));
+        }
+        return tsModel.withRemovedEnums(stringEnums).withAddedEnums(new ArrayList<>(enums));
+    }
+
+    private Field extractKinnuEnumField(Class<Enum<?>> origin, List<String> kinnuEnumFields) {
+        for (String kinnuEnumField : kinnuEnumFields) {
+            try {
+                if (Arrays.stream(origin.getDeclaredFields()).anyMatch(it -> it.getName().equals(kinnuEnumField))) {
+                    final Field idField = origin.getDeclaredField(kinnuEnumField);
+                    idField.setAccessible(true);
+                    return idField;
+                }
+            } catch (Exception e) {
+                // doesn't work
+            }
+        }
+
+        return null;
     }
 
     private TsModel transformNonStringEnumKeyMaps(SymbolTable symbolTable, TsModel tsModel) {
